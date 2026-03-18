@@ -7,18 +7,20 @@ const output = document.querySelector("#output");
 const prev = document.querySelector("#prev");
 const next = document.querySelector("#next");
 
- let pages = 2;
- const itemsPerPage = 20;
- const setPages = (pageNum)=>{
-    pages = pageNum;
- }
+let pages = 2;
+const itemsPerPage = 20;
+const setPages = (pageNum) => {
+  pages = pageNum;
+};
+ 
 //Get data from the Rick & Morty API//
 async function getData(url) {
     try {
         const res = await fetch(url)
-
-        if(res.status !== 200){
-            throw new Error("Failed to fetch")
+        if(res.status === 403){
+          throw new Error(
+            "Access Forbidden (403). Maybe the Council of Ricks blocked this page.",
+          );
         }
 
         const data = await res.json()
@@ -30,9 +32,10 @@ async function getData(url) {
 
 //Render Function & Output//
 function render({results}){
-    console.log("Loading...Fetching your info")
     results.forEach(function (info) {
       console.log(info);
+      const h2 = document.createElement("h2");
+      h2.textContent = "Loading Fetching Results...."
       const id = document.createElement("id");
       id.textContent = "ID: " + info.id
       console.log(info.id);
@@ -55,6 +58,7 @@ function render({results}){
       img.alt = info.name
 
       output.textContent = ""
+      output.appendChild(h2);
       output.appendChild(id);
       output.appendChild(name);
       output.appendChild(status);

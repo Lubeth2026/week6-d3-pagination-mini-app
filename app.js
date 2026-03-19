@@ -7,35 +7,33 @@ const output = document.querySelector("#output");
 const prev = document.querySelector("#prev");
 const next = document.querySelector("#next");
 
-let pages = 2;
-const itemsPerPage = 20;
+let page = 1;
 const setPages = (pageNum) => {
   pages = pageNum;
 };
  
 //Get data from the Rick & Morty API//
 async function getData(url) {
-    try {
-        const res = await fetch(url)
-        if(res.status === 403){
-          throw new Error(
-            "Access Forbidden (403). Maybe the Council of Ricks blocked this page.",
-          );
-        }
-
-        const data = await res.json()
-        return data;
-    } catch (error) {
-        console.error(error) 
+  try {
+    const res = await fetch(url)
+    if(res.status === 403){
+      throw new Error(
+        "Access Forbidden (403). Maybe the Council of Ricks blocked this page.",
+      );
     }
+    
+    const data = await res.json()
+    return data;
+  } catch (error) {
+    console.error(error) 
+  }
 }
 
 //Render Function & Output//
 function render({results}){
-    results.forEach(function (info) {
+      output.textContent = ""
+  results.forEach(function (info) {
       console.log(info);
-      const h2 = document.createElement("h2");
-      h2.textContent = "Loading Fetching Results...."
       const id = document.createElement("id");
       id.textContent = "ID: " + info.id
       console.log(info.id);
@@ -57,8 +55,7 @@ function render({results}){
       }
       img.alt = info.name
 
-      output.textContent = ""
-      output.appendChild(h2);
+      
       output.appendChild(id);
       output.appendChild(name);
       output.appendChild(status);
@@ -71,17 +68,23 @@ function render({results}){
 async function main() {
     try {
         //Get data on page load//
-        const info = await getData("https://rickandmortyapi.com/api/character/?page" + pages);
+        const info = await getData("https://rickandmortyapi.com/api/character/?page=" + page);
+        render(info)
         console.log("Ready to fetch")
 
         prev.addEventListener("click", async()=>{
-        const info = await getData("https://rickandmortyapi.com/api/character/?page" + pages);
+          if(page > 1){
+            page--;
+            prev.disabled = page === 1;
+          }
+        const info = await getData("https://rickandmortyapi.com/api/character/?page=" + page);
         console.log(info)
         render(info)
         })
 
         next.addEventListener("click", async()=>{
-        const info = await getData("https://rickandmortyapi.com/api/character/?page" + pages);
+          page++;
+        const info = await getData("https://rickandmortyapi.com/api/character/?page=" + page);
         console.log(info)
         render(info)
         })
@@ -89,5 +92,6 @@ async function main() {
     } catch (error) {
       console.log("This line will never run anyway");  
     }
-}
+    
+    }
 main()
